@@ -59,11 +59,13 @@ const PostDetail = () => {
 			if (!res.ok) throw new Error("Failed to post comment");
 
 			const savedComment = await res.json();
+			console.log(savedComment);
 			setComments([...comments, savedComment]);
 
 			// reset inputs
 			setName("");
 			setComment("");
+			
 		} catch (err) {
 			console.error("Error posting comment:", err.message);
 		}
