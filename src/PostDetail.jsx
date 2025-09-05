@@ -14,14 +14,22 @@ const PostDetail = () => {
 	const [comment, setComment] = useState("");
 	const [comments, setComments] = useState([]);
 
+	// Fetch post + comments
 	useEffect(() => {
 		const fetchPost = async () => {
 			try {
 				const res = await fetch(
 					`https://anime-blog-7oi4.onrender.com/api/posts/${id}`
 				);
+				if (!res.ok) throw new Error("Failed to fetch post");
+
 				const data = await res.json();
 				setPost(data);
+
+				// 👇 load comments from backend
+				if (data.comments) {
+					setComments(data.comments);
+				}
 			} catch (err) {
 				console.error("Error fetching post:", err.message);
 			} finally {
@@ -41,7 +49,7 @@ const PostDetail = () => {
 		}
 
 		const newComment = {
-			title: "Otaku Comment", // fixed title (backend requirement)
+			title: "Otaku Comment", // fixed title for backend
 			name,
 			content: comment,
 		};
@@ -59,13 +67,13 @@ const PostDetail = () => {
 			if (!res.ok) throw new Error("Failed to post comment");
 
 			const savedComment = await res.json();
-			console.log(savedComment);
-			setComments([...comments, savedComment]);
+
+			// 👇 add new comment to list
+			setComments((prev) => [savedComment, ...prev]);
 
 			// reset inputs
 			setName("");
 			setComment("");
-			
 		} catch (err) {
 			console.error("Error posting comment:", err.message);
 		}
@@ -141,6 +149,9 @@ const PostDetail = () => {
 								</p>
 								<p className="text-gray-700 mt-1">
 									{c.content}
+								</p>
+								<p className="text-xs text-gray-400 mt-1">
+									{new Date(c.createdAt).toLocaleString()}
 								</p>
 							</li>
 						))}
