@@ -94,7 +94,8 @@ const Readerpost = () => {
 						))
 					) : (
 						<p className="text-gray-500 text-center col-span-full">
-							No posts available.
+								{posts 
+								||"No posts available."}
 						</p>
 					)}
 				</div>
