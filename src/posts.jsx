@@ -4,6 +4,8 @@ import "./App.css";
 
 const Readerpost = () => {
 	const [posts, setPosts] = useState([]);
+	const [loading, setLoading] = useState(true); // ✅ loading state
+	const [error, setError] = useState(null); // optional error handling
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -12,8 +14,8 @@ const Readerpost = () => {
 				const res = await fetch(
 					"https://anime-blog-7oi4.onrender.com/api/posts"
 				);
+				if (!res.ok) throw new Error("Failed to fetch posts");
 				const data = await res.json();
-				console.log(data);
 
 				if (Array.isArray(data)) {
 					setPosts(data);
@@ -24,7 +26,10 @@ const Readerpost = () => {
 				}
 			} catch (err) {
 				console.log("Error fetching posts:", err.message);
+				setError(err.message);
 				setPosts([]);
+			} finally {
+				setLoading(false); // ✅ stop loading
 			}
 		};
 
@@ -41,7 +46,15 @@ const Readerpost = () => {
 			{/* Posts Grid */}
 			<div className="flex justify-center">
 				<div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl">
-					{Array.isArray(posts) && posts.length > 0 ? (
+					{loading ? (
+						<p className="text-gray-500 text-center col-span-full animate-pulse">
+							Loading posts...
+						</p>
+					) : error ? (
+						<p className="text-red-500 text-center col-span-full">
+							Error: {error}
+						</p>
+					) : posts.length > 0 ? (
 						posts.map((post) => (
 							<div
 								key={post.id}
@@ -94,8 +107,7 @@ const Readerpost = () => {
 						))
 					) : (
 						<p className="text-gray-500 text-center col-span-full">
-								{posts 
-								||"No posts available."}
+							No posts available.
 						</p>
 					)}
 				</div>
